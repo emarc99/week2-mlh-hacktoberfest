@@ -227,11 +227,16 @@ footer,
   }
 }
 
-/* Streamlit widgets → ink rectangles */
+/* Streamlit widgets → ink rectangles (force label contrast on nested spans/p) */
 div.stButton > button,
-div.stDownloadButton > button {
+div.stDownloadButton > button,
+button[data-testid="baseButton-primary"],
+button[data-testid="baseButton-secondary"],
+button[kind="primary"],
+button[kind="secondary"] {
   background: var(--ink) !important;
-  color: var(--card) !important;
+  background-color: var(--ink) !important;
+  color: #efebe1 !important;
   border: 1px solid var(--ink) !important;
   border-radius: var(--radius) !important;
   font-family: var(--font-mono) !important;
@@ -240,15 +245,42 @@ div.stDownloadButton > button {
   text-transform: uppercase !important;
   font-weight: 500 !important;
   padding: 0.7rem 1rem !important;
+  opacity: 1 !important;
+}
+div.stButton > button *,
+div.stDownloadButton > button *,
+button[data-testid="baseButton-primary"] *,
+button[data-testid="baseButton-secondary"] *,
+button[kind="primary"] *,
+button[kind="secondary"] * {
+  color: #efebe1 !important;
+  opacity: 1 !important;
+  visibility: visible !important;
 }
 div.stButton > button:hover,
-div.stDownloadButton > button:hover {
+div.stDownloadButton > button:hover,
+button[data-testid="baseButton-primary"]:hover,
+button[kind="primary"]:hover {
   background: var(--scarlet) !important;
+  background-color: var(--scarlet) !important;
   border-color: var(--scarlet) !important;
   color: #efebe1 !important;
 }
-div.stButton > button[kind="secondary"] {
+div.stButton > button:hover *,
+div.stDownloadButton > button:hover *,
+button[data-testid="baseButton-primary"]:hover *,
+button[kind="primary"]:hover * {
+  color: #efebe1 !important;
+}
+div.stButton > button[kind="secondary"],
+button[data-testid="baseButton-secondary"] {
   background: var(--card) !important;
+  background-color: var(--card) !important;
+  color: var(--ink) !important;
+  border-color: var(--ink) !important;
+}
+div.stButton > button[kind="secondary"] *,
+button[data-testid="baseButton-secondary"] * {
   color: var(--ink) !important;
 }
 

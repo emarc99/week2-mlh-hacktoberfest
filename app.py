@@ -5,7 +5,6 @@ from __future__ import annotations
 import html
 import io
 import os
-from datetime import date
 from pathlib import Path
 
 import streamlit as st
@@ -49,16 +48,8 @@ def section_kicker(kicker: str, title: str) -> None:
 
 inject_broadsheet_css()
 
-edition = date.today().strftime("%A, %B %d, %Y")
-
 st.markdown(
-    f"""
-<div class="sl-dateline">
-  <span>Vol. I · No. 1 · Gemma 4 Edition</span>
-  <time>{edition}</time>
-  <span class="scarlet">Special edition · {GEMMA_MODEL}</span>
-</div>
-
+    """
 <div class="sl-masthead">
   <p class="sl-kicker-brand">The Slip Ledger</p>
   <h1>SLIPSLEDGER</h1>
