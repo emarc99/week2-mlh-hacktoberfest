@@ -1,8 +1,10 @@
 # SlipsLedger
 
-Photo of a rent, utility, security, cleaner, or estate-dues slip → **Gemma 4** classifies and extracts → SQLite ledger + CSV.
+**SlipsLedger** turns a photo of a Nigerian compound payment slip into a structured ledger row — classified and extracted by **Gemma 4** (`gemma-4-26b-a4b-it` via the Gemini API), then saved to SQLite and exportable as CSV.
 
-Built for MLH Ibadan Hack Day / DEV Week 2. **Gemma is the core** — without the multimodal model call there is no product. Streamlit displays results; SQLite stores them; DigitalOcean App Platform hosts the demo.
+Tenants, agents, and landlords often keep rent, PHCN/NEPA utility, security/vigilante, compound cleaner, and estate service-charge proof as WhatsApp images or paper scraps. Those trails are easy to lose and weak in a dispute. SlipsLedger is built so the **multimodal model is the product**: upload a real slip image → Gemma returns payment type, amount, date, parties, unit, risk flags, and a WhatsApp-ready confirmation draft → the app auto-files the row and lets you filter the ledger or download CSV. Streamlit is the UI; SQLite is local persistence. Without a live Gemma call there is no extraction path and no mock data.
+
+Built for **MLH Ibadan Hack Day** and **DEV Week 2** (Best Use of Gemma 4 / open-source AI). Demo locally or on Streamlit Community Cloud / DigitalOcean App Platform with `GEMINI_API_KEY` as a secret.
 
 ## Problem
 
@@ -154,6 +156,7 @@ Without the secret, Analyze will fail — there is no mock path.
 ## Project layout
 
 ```
+streamlit_app.py            # Community Cloud entrypoint → app.py
 app.py                      # Streamlit broadsheet UI (orchestration)
 assets/style.css            # Newsprint theme (portfolio-aligned)
 .streamlit/config.toml      # Paper/ink Streamlit theme
