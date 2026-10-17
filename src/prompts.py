@@ -33,7 +33,9 @@ EXTRACTION_SCHEMA_HINT = """{
   "whatsapp_draft": string
 }"""
 
-USER_PROMPT = f"""Analyze this payment slip image.
+USER_PROMPT = f"""{SYSTEM_INSTRUCTION}
+
+Analyze this payment slip image.
 
 Allowed payment_type values exactly:
 - rent
