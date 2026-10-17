@@ -14,3 +14,7 @@ data/*.db-journal
 Thumbs.db
 *.log
 .streamlit/secrets.toml
+
+.tmp-ref/
+data/smoke/
+data/slips_export.csv
