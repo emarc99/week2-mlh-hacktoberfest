@@ -107,16 +107,20 @@ if uploaded is not None:
         st.info(f"Uploaded: {uploaded.name}")
 
     if st.button("Analyze with Gemma 4", type="primary", width="stretch"):
-        with st.spinner(f"Calling {GEMMA_MODEL}…"):
+        with st.spinner(f"Calling {GEMMA_MODEL} (retries on temporary API errors)…"):
             try:
                 result = analyze_slip(image_bytes, mime_type=mime)
             except Exception as exc:
                 st.error(str(exc))
-                st.stop()
-        st.session_state["last_result"] = result
-        st.session_state["last_filename"] = uploaded.name
-        row_id = save_slip(result, source_filename=uploaded.name)
-        st.session_state["last_saved_id"] = row_id
+                st.info(
+                    "Tip: Google sometimes returns INTERNAL 500 briefly. "
+                    "Wait a few seconds and press Analyze again — the client retries automatically."
+                )
+            else:
+                st.session_state["last_result"] = result
+                st.session_state["last_filename"] = uploaded.name
+                row_id = save_slip(result, source_filename=uploaded.name)
+                st.session_state["last_saved_id"] = row_id
 
 result = st.session_state.get("last_result")
 
