@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import html
 import io
 import os
 from datetime import date
@@ -138,11 +139,13 @@ else:
         '<p class="sl-section-kicker">Classification</p>',
         unsafe_allow_html=True,
     )
+    pay_type = html.escape(str(result.get("payment_type") or ""))
+    confidence = html.escape(str(result.get("confidence") if result.get("confidence") is not None else "—"))
     st.markdown(
         f"""
 <div class="sl-panel">
-  <div class="sl-field-row"><span class="label">Payment type</span><span class="value"><code>{result.get('payment_type')}</code></span></div>
-  <div class="sl-field-row"><span class="label">Confidence</span><span class="value">{result.get('confidence')}</span></div>
+  <div class="sl-field-row"><span class="label">Payment type</span><span class="value"><code>{pay_type}</code></span></div>
+  <div class="sl-field-row"><span class="label">Confidence</span><span class="value">{confidence}</span></div>
 </div>
 """,
         unsafe_allow_html=True,
@@ -164,9 +167,9 @@ else:
     ]
     rows_html = []
     for label, value in fields:
-        display = value if value not in (None, "") else "—"
+        display = html.escape(str(value)) if value not in (None, "") else "—"
         rows_html.append(
-            f'<div class="sl-field-row"><span class="label">{label}</span>'
+            f'<div class="sl-field-row"><span class="label">{html.escape(label)}</span>'
             f'<span class="value">{display}</span></div>'
         )
     st.markdown(
