@@ -101,12 +101,12 @@ if uploaded is not None:
         st.image(
             Image.open(io.BytesIO(image_bytes)),
             caption=uploaded.name,
-            use_container_width=True,
+            width="stretch",
         )
     except Exception:
         st.info(f"Uploaded: {uploaded.name}")
 
-    if st.button("Analyze with Gemma 4", type="primary", use_container_width=True):
+    if st.button("Analyze with Gemma 4", type="primary", width="stretch"):
         with st.spinner(f"Calling {GEMMA_MODEL}…"):
             try:
                 result = analyze_slip(image_bytes, mime_type=mime)
@@ -211,7 +211,7 @@ else:
     with st.expander("Raw extracted JSON"):
         st.json({k: v for k, v in result.items() if k != "raw_model_text"})
 
-    if st.button("Save again to ledger", use_container_width=True):
+    if st.button("Save again to ledger", width="stretch"):
         row_id = save_slip(
             result,
             source_filename=st.session_state.get("last_filename"),
@@ -253,7 +253,7 @@ else:
         }
         for row in rows
     ]
-    st.dataframe(display, use_container_width=True, hide_index=True)
+    st.dataframe(display, width="stretch", hide_index=True)
 
     export_path = Path("data") / "slips_export.csv"
     path = export_csv(
@@ -266,7 +266,7 @@ else:
         data=csv_bytes,
         file_name="slips_export.csv",
         mime="text/csv",
-        use_container_width=True,
+        width="stretch",
         type="primary",
     )
     st.caption(f"CSV also written to `{path}` ({len(rows)} row(s)).")
