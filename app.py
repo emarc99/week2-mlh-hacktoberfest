@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import io
 import os
+from datetime import date
 from pathlib import Path
 
 import streamlit as st
@@ -17,11 +18,63 @@ from src.prompts import PAYMENT_TYPES
 load_dotenv()
 init_db()
 
-st.set_page_config(page_title="SlipsLedger", page_icon="🧾", layout="wide")
-st.title("SlipsLedger")
-st.caption(
-    f"Photo of a rent/utility/security slip → **{GEMMA_MODEL}** "
-    "(Gemma 4 via Gemini API) → structured ledger + CSV."
+st.set_page_config(
+    page_title="SlipsLedger · The Slip Ledger",
+    page_icon="📰",
+    layout="wide",
+    initial_sidebar_state="collapsed",
+)
+
+STYLE_PATH = Path(__file__).resolve().parent / "assets" / "style.css"
+
+
+def inject_broadsheet_css() -> None:
+    css = STYLE_PATH.read_text(encoding="utf-8") if STYLE_PATH.exists() else ""
+    st.markdown(f"<style>\n{css}\n</style>", unsafe_allow_html=True)
+
+
+def section_kicker(kicker: str, title: str) -> None:
+    st.markdown(
+        f"""
+<div class="sl-section">
+  <p class="sl-section-kicker">{kicker}</p>
+  <h2 class="sl-section-title">{title}</h2>
+  <div class="sl-rule-thin"></div>
+</div>
+""",
+        unsafe_allow_html=True,
+    )
+
+
+inject_broadsheet_css()
+
+edition = date.today().strftime("%A, %B %d, %Y")
+
+st.markdown(
+    f"""
+<div class="sl-dateline">
+  <span>Vol. I · No. 1 · Gemma 4 Edition</span>
+  <time>{edition}</time>
+  <span class="scarlet">Special edition · {GEMMA_MODEL}</span>
+</div>
+
+<div class="sl-masthead">
+  <p class="sl-kicker-brand">The Slip Ledger</p>
+  <h1>SLIPSLEDGER</h1>
+  <div class="sl-rule-thick"></div>
+  <p class="sl-tagline">Scan · Extract · Ledger</p>
+</div>
+
+<div class="sl-lede-wrap">
+  <h2>Photo of a payment slip, printed into a structured ledger.</h2>
+  <p>
+    Upload a rent, utility, security, cleaner, or estate-dues slip.
+    <strong>Gemma&nbsp;4</strong> classifies and extracts the facts —
+    risk flags, a WhatsApp confirmation, and a CSV-ready SQLite ledger.
+  </p>
+</div>
+""",
+    unsafe_allow_html=True,
 )
 
 if not os.getenv("GEMINI_API_KEY", "").strip():
@@ -31,9 +84,10 @@ if not os.getenv("GEMINI_API_KEY", "").strip():
     )
 
 # ---------------------------------------------------------------------------
-# 1) Upload
+# Section A · Scan
 # ---------------------------------------------------------------------------
-st.header("1. Upload slip")
+section_kicker("Section A · Scan", "Upload the slip")
+
 uploaded = st.file_uploader(
     "Image of handwritten or printed slip (PNG / JPG / WEBP)",
     type=["png", "jpg", "jpeg", "webp"],
@@ -60,53 +114,84 @@ if uploaded is not None:
                 st.stop()
         st.session_state["last_result"] = result
         st.session_state["last_filename"] = uploaded.name
-        # Auto-save every successful analyze so ledger/CSV are never "missing"
         row_id = save_slip(result, source_filename=uploaded.name)
         st.session_state["last_saved_id"] = row_id
 
 result = st.session_state.get("last_result")
 
 # ---------------------------------------------------------------------------
-# 2) Results (full width — no side-by-side squeeze)
+# Section B · Dispatch
 # ---------------------------------------------------------------------------
-st.header("2. Gemma results")
+section_kicker("Section B · Dispatch", "Gemma report")
+
 if not result:
-    st.info("Upload a slip and click **Analyze with Gemma 4** to see classification, fields, risk flags, and WhatsApp text here.")
+    st.info(
+        "Upload a slip in Section A and press **Analyze with Gemma 4** "
+        "to print classification, fields, risk flags, and WhatsApp copy here."
+    )
 else:
     saved_id = st.session_state.get("last_saved_id")
     if saved_id is not None:
-        st.success(f"Saved to SQLite ledger as id **{saved_id}**.")
+        st.success(f"Filed in the ledger as id **{saved_id}**.")
 
-    st.subheader("Classification")
-    st.markdown(f"**Payment type:** `{result.get('payment_type')}`")
-    st.markdown(f"**Confidence:** {result.get('confidence')}")
+    st.markdown(
+        '<p class="sl-section-kicker">Classification</p>',
+        unsafe_allow_html=True,
+    )
+    st.markdown(
+        f"""
+<div class="sl-panel">
+  <div class="sl-field-row"><span class="label">Payment type</span><span class="value"><code>{result.get('payment_type')}</code></span></div>
+  <div class="sl-field-row"><span class="label">Confidence</span><span class="value">{result.get('confidence')}</span></div>
+</div>
+""",
+        unsafe_allow_html=True,
+    )
 
-    st.subheader("Extracted fields")
-    fields = {
-        "Amount": f"{result.get('amount')} {result.get('currency') or ''}".strip(),
-        "Payment date": result.get("payment_date"),
-        "Payer": result.get("payer_name"),
-        "Payee": result.get("payee_name"),
-        "Unit / property": result.get("property_or_unit"),
-        "Period covered": result.get("period_covered"),
-        "Reference / receipt no.": result.get("reference_or_receipt_no"),
-        "Notes": result.get("notes"),
-    }
-    for label, value in fields.items():
-        st.markdown(f"**{label}:** {value if value not in (None, '') else '—'}")
+    st.markdown(
+        '<p class="sl-section-kicker">Extracted fields</p>',
+        unsafe_allow_html=True,
+    )
+    fields = [
+        ("Amount", f"{result.get('amount')} {result.get('currency') or ''}".strip()),
+        ("Payment date", result.get("payment_date")),
+        ("Payer", result.get("payer_name")),
+        ("Payee", result.get("payee_name")),
+        ("Unit / property", result.get("property_or_unit")),
+        ("Period covered", result.get("period_covered")),
+        ("Reference", result.get("reference_or_receipt_no")),
+        ("Notes", result.get("notes")),
+    ]
+    rows_html = []
+    for label, value in fields:
+        display = value if value not in (None, "") else "—"
+        rows_html.append(
+            f'<div class="sl-field-row"><span class="label">{label}</span>'
+            f'<span class="value">{display}</span></div>'
+        )
+    st.markdown(
+        f'<div class="sl-panel">{"".join(rows_html)}</div>',
+        unsafe_allow_html=True,
+    )
 
-    st.subheader("Risk flags")
+    st.markdown(
+        '<p class="sl-section-kicker">Risk flags</p>',
+        unsafe_allow_html=True,
+    )
     flags = result.get("risk_flags") or []
     if flags:
         for flag in flags:
             st.warning(flag)
     else:
-        st.success("No risk flags")
+        st.success("No risk flags on this slip.")
 
-    st.subheader("WhatsApp message")
-    st.caption(
-        "Copy the text below and paste into WhatsApp to confirm the payment. "
-        "Select all in the box (Ctrl+A) then Ctrl+C, or copy from the code block."
+    st.markdown(
+        '<p class="sl-section-kicker">WhatsApp message</p>',
+        unsafe_allow_html=True,
+    )
+    st.markdown(
+        '<p class="sl-copy-hint">Copy for WhatsApp · Ctrl+A then Ctrl+C</p>',
+        unsafe_allow_html=True,
     )
     draft = result.get("whatsapp_draft") or ""
     if draft:
@@ -132,9 +217,9 @@ else:
         st.success(f"Saved again as id **{row_id}**.")
 
 # ---------------------------------------------------------------------------
-# 3) Ledger + CSV (always visible — not hidden in a tab)
+# Section C · Ledger
 # ---------------------------------------------------------------------------
-st.header("3. SQLite ledger & CSV export")
+section_kicker("Section C · Ledger", "SQLite archive & CSV")
 st.caption(f"Database file: `{Path('data') / 'slips.db'}`")
 
 filter_type = st.selectbox(
@@ -145,7 +230,7 @@ filter_type = st.selectbox(
 rows = list_slips(payment_type=None if filter_type == "all" else filter_type)
 
 if not rows:
-    st.info("No slips in the ledger yet. Analyze a slip above — it auto-saves here.")
+    st.info("No slips in the ledger yet. Analyze a slip above — it auto-files here.")
 else:
     display = [
         {
