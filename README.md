@@ -127,6 +127,22 @@ See `.env.example`.
 5. List / filter the ledger
 6. Export CSV
 
+## Deploy on Streamlit Community Cloud
+
+1. Open [share.streamlit.io/deploy](https://share.streamlit.io/deploy).
+2. Repository: `emarc99/week2-mlh-hacktoberfest` · Branch: `main`.
+3. **Main file path:** `streamlit_app.py` (Cloud default) — or `app.py`.
+4. **Advanced settings → Secrets** (TOML):
+
+   ```toml
+   GEMINI_API_KEY = "your_key_here"
+   ```
+
+   The app also reads `GEMINI_API_KEY` from the environment; Streamlit secrets are exposed as `st.secrets` — ensure the key is available (see below).
+5. Deploy. Live URL looks like `https://<app-name>.streamlit.app`.
+
+Without the secret, Analyze will fail — there is no mock path.
+
 ## Deploy on DigitalOcean App Platform
 
 1. Redeem your Hack Day DigitalOcean credit.

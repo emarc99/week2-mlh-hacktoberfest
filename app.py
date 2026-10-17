@@ -16,6 +16,21 @@ from src.gemma_client import GEMMA_MODEL, analyze_slip
 from src.prompts import PAYMENT_TYPES
 
 load_dotenv()
+
+
+def _load_gemini_key_from_secrets() -> None:
+    """Streamlit Community Cloud injects secrets via st.secrets, not always the env."""
+    if os.getenv("GEMINI_API_KEY", "").strip():
+        return
+    try:
+        secret = st.secrets.get("GEMINI_API_KEY", "")
+    except Exception:
+        return
+    if secret:
+        os.environ["GEMINI_API_KEY"] = str(secret).strip()
+
+
+_load_gemini_key_from_secrets()
 init_db()
 
 st.set_page_config(
