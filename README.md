@@ -1,14 +1,14 @@
 # SlipsLedger
 
-**SlipsLedger** turns a photo of a Nigerian compound payment slip into a structured ledger row — classified and extracted by **Gemma 4** (`gemma-4-26b-a4b-it` via the Gemini API), then saved to SQLite and exportable as CSV.
+**SlipsLedger** turns a photo of a rent or recurring housing payment slip into a structured ledger row — classified and extracted by **Gemma 4** (`gemma-4-26b-a4b-it` via the Gemini API), then saved to SQLite and exportable as CSV.
 
-Tenants, agents, and landlords often keep rent, PHCN/NEPA utility, security/vigilante, compound cleaner, and estate service-charge proof as WhatsApp images or paper scraps. Those trails are easy to lose and weak in a dispute. SlipsLedger is built so the **multimodal model is the product**: upload a real slip image → Gemma returns payment type, amount, date, parties, unit, risk flags, and a WhatsApp-ready confirmation draft → the app auto-files the row and lets you filter the ledger or download CSV. Streamlit is the UI; SQLite is local persistence. Without a live Gemma call there is no extraction path and no mock data.
+Tenants, agents, and landlords often keep rent, utility, security, cleaner, and service-charge proof as WhatsApp images or paper scraps. Those trails are easy to lose and weak in a dispute. SlipsLedger is built so the **multimodal model is the product**: upload a real slip image → Gemma returns payment type, amount, date, parties, property/unit, risk flags, and a WhatsApp-ready confirmation draft → the app auto-files the row and lets you filter the ledger or download CSV. Streamlit is the UI; SQLite is local persistence. Without a live Gemma call there is no extraction path and no mock data.
 
 Built for **MLH Ibadan Hack Day** and **DEV Week 2** (Best Use of Gemma 4 / open-source AI). Demo locally or on Streamlit Community Cloud / DigitalOcean App Platform with `GEMINI_API_KEY` as a secret.
 
 ## Problem
 
-Paper and WhatsApp photo trails for recurring Nigerian compound payments are easy to lose and weak in a dispute. SlipsLedger turns those photos into structured ledger rows with risk flags and a WhatsApp confirmation draft.
+Paper and WhatsApp photo trails for recurring housing payments are easy to lose and weak in a dispute. SlipsLedger turns those photos into structured ledger rows with risk flags and a WhatsApp confirmation draft.
 
 ## AI core
 
