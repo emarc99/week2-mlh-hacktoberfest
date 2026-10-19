@@ -17,6 +17,13 @@ from src.prompts import PAYMENT_TYPES
 
 load_dotenv()
 
+st.set_page_config(
+    page_title="SlipsLedger · The Slip Ledger",
+    page_icon="📰",
+    layout="wide",
+    initial_sidebar_state="collapsed",
+)
+
 
 def _load_gemini_key_from_secrets() -> None:
     """Streamlit Community Cloud injects secrets via st.secrets, not always the env."""
@@ -32,13 +39,6 @@ def _load_gemini_key_from_secrets() -> None:
 
 _load_gemini_key_from_secrets()
 init_db()
-
-st.set_page_config(
-    page_title="SlipsLedger · The Slip Ledger",
-    page_icon="📰",
-    layout="wide",
-    initial_sidebar_state="collapsed",
-)
 
 STYLE_PATH = Path(__file__).resolve().parent / "assets" / "style.css"
 
